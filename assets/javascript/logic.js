@@ -1,52 +1,55 @@
 $(document).ready(function(){
 
-  var planetViews = ["wild", "ocean"];
+  var planetViews = ["Ocean", "Forest", "Desert"];
   
-  //create buttons (preset)
-  function createButtons(){
-    $('#views-button').empty();
+  function renderButtons(){
+    $('#button-view').empty();
     for (var i = 0; i < planetViews.length; i++){
       var renderBtns = $('<button>');
-      renderBtns.text(planetViews[i]).attr('data-name', planetViews[i]).addClass('planetviewBtn');
-      $('#views-button').append(renderBtns);
+      renderBtns.text(planetViews[i]);
+      renderBtns.attr('data-name', planetViews[i]);
+      renderBtns.addClass('viewBtn');
+      $('#button-view').append(renderBtns);
     }
   }
-  // create buttons (user generated)
   
-  $('#add-views-button').click(function(){
+  $('#add-view').click(function(){
     event.preventDefault();
-    var userInput = $('#views-input').val().trim();
+    var userInput = $('#view-input').val().trim();
     planetViews.push(userInput);
-    createButtons();
+    renderButtons();
   });
   
   function displayGifs(){
     $('#planet-view').empty();
-    var planet = $(this).attr('data-name');
-    console.log(planet);
-    var queryURL = "https://api.giphy.com/v1/gifs/search?q" + planet + "&limit=10&api_key=I5uBD2vez782fvidks1MmN7L68YmekPy";
+  
+    var view = $(this).attr('data-name');
+    var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + view + "&api_key=mO2dCM46HESUzmhnGfAIXRWHF9ra1UNs";
   
     $.ajax({
       url: queryURL, 
       method: 'GET'
-    }) .done(function(response){
+    })
+      .done(function(response){
+        
         var result = response.data;
+        console.log(result);
   
         for (var i = 0; i < result.length; i++){
-          var planetDiv = $('<div class="search-item">');
+          var gifDiv = $('<div class="item">');
           var rating = result[i].rating;
           var p = $('<p>').text('Rating: ' + rating);
-          var animated = result[i].images.fixed_height.url;
-          var still = result[i].images.fixed_height_still.url;
           var image = $('<img>');
-          image.attr('src', still);
+          image.attr('src', result[i].images.fixed_height_still.url);
+          image.addClass('gif');
           image.attr('data-state', 'still');
-          image.attr('data-animated', animate);
-          image.attr('data-still', still);
-          image.addClass("searchImage");
-          planetDiv.append(p);
-          planetDiv.append(image);
-          $('#planet-view').prepend(planetDiv);
+          image.attr('data-animate', result[i].images.fixed_height.url);
+          image.attr('data-still', result[i].images.fixed_height_still.url);
+          
+          gifDiv.prepend(p);
+          gifDiv.prepend(image);
+  
+          $('#planet-view').prepend(gifDiv);
         }
       });
   }
@@ -68,6 +71,6 @@ $(document).ready(function(){
   
   
   $(document).on("click", ".gif", checkState);
-  $(document).on("click", ".planetviewBtn", displayGifs);
-  createButtons();
+  $(document).on("click", ".viewBtn", displayGifs);
+  renderButtons();
   });
